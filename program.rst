@@ -1,0 +1,9 @@
++======================+
+| Monday               |
++===============+======+
+| 10:00 - 13:00 | Introduction to the course |
+|               | Installation of software  |
+|               | Introduction to Python |
++======================+
+| Tuesday              |
++===============+======+
