@@ -82,8 +82,8 @@ class Profile():
         # loop through all values except last
         for i in range(self.nPoints - 1):
             # get temperature gradient
-            gradient = ((self.temp[i+1]  - self.temp[i]) /
-                        (self.depth[i+1] - self.depth[i]))
+            gradient = ((self.temp[i]  - self.temp[i+1]) /
+                        (self.depth[i] - self.depth[i+1]))
 
             # break loop when gradient above threshold
             if abs(gradient) > threshold:
