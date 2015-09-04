@@ -77,6 +77,7 @@
       shell: 'pip install basemap --allow-external basemap --allow-unverified basemap'
       environment:
         PATH: "{{ conda_dir }}/bin:{{ ansible_env.PATH }}"
+        GEOS_DIR: "{{ conda_dir }}"
       args:
         creates: '{{ conda_dir }}/lib/python2.7/site-packages/basemap-1.0.7.dist-info'
 
@@ -107,17 +108,14 @@
         chdir: '{{ dev_sources_dir }}/openwind'
 
     - name: Create data folder
-      sudo: no
       file: path="{{ data_dir }}" state=directory
 
     - name: Download Sentinel-1 sample acquisition
-      sudo: no
       get_url:
         url: ftp://ftp.nersc.no/pub/python_test_data/sentinel1a/S1A_IW_GRDH_1SDV_20141003T053708_20141003T053737_002661_002F66_A2F4.zip
         dest: "{{ data_dir }}"
 
     - name: Add Ipython Notebook to crontab
-      sudo: yes
       cron: name="Ipython Notebook" special_time=reboot job="{{ conda_dir }}/bin/ipython notebook --ip=0.0.0.0 --no-browser --notebook-dir=/home/vagrant/notebooks"
 
     #- name: Launch Ipython Notebook
