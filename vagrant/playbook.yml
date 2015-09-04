@@ -18,6 +18,7 @@
       with_items:
         - git
         - libx11-dev
+        - g++
 
     - name: Download Miniconda
       get_url:
@@ -43,18 +44,40 @@
       args:
         creates: '{{ conda_dir }}/conda-meta/history'
 
-    - name: Instal Scientific Python packages
+    - name: Install scientific Python packages
       shell: 'export PATH={{ conda_dir }}/bin:$PATH; conda install -q --yes {{ item }}'
       with_items:
         numpy
         scipy
         matplotlib
         nose
-        basemap
         pillow
-        gdal
         ipython
         ipython-notebook
+        postgresql
+        curl
+        pycurl
+        cython
+
+    - name: Install GDAL packages from OSGEO
+      shell: 'export PATH={{ conda_dir }}/bin:$PATH; conda install -q --yes -c osgeo {{ item }}'
+      with_items:
+        - gdal=1.11.2=np19py27_10
+        - proj4
+        - geos
+        - xerces-c
+        - libnetcdf=4.3.3.1=0
+        - hdf5=1.8.14=10
+
+    - name: Add GDAL_DATA to .bashrc
+      lineinfile: dest=/home/vagrant/.bashrc line="export GDAL_DATA={{ conda_dir }}/share/gdal"
+
+    - name: Install Basemap with PIP
+      shell: 'pip install basemap --allow-external basemap --allow-unverified basemap'
+      environment:
+        PATH: "{{ conda_dir }}/bin:{{ ansible_env.PATH }}"
+      args:
+        creates: '{{ conda_dir }}/lib/python2.7/site-packages/basemap-1.0.7.dist-info'
 
     - name: Update/checkout Nansat
       git: repo=https://github.com/nansencenter/nansat
@@ -63,10 +86,11 @@
            update=yes
 
     - name: Install Nansat
-      shell: 'export PATH={{ conda_dir }}/bin:$PATH; {{ conda_dir }}/bin/python setup.py install'
+      shell: '{{ conda_dir }}/bin/python setup.py install'
+      environment:
+        PATH: "{{ conda_dir }}/bin:{{ ansible_env.PATH }}"
       args:
         chdir: '{{ dev_sources_dir }}/nansat'
-      sudo: yes
 
     - name: Add Ipython Notebook to crontab
       sudo: yes
