@@ -87,7 +87,7 @@
            update=yes
 
     - name: Install Nansat
-      shell: '{{ conda_dir }}/bin/python setup.py install'
+      shell: 'python setup.py install'
       environment:
         PATH: "{{ conda_dir }}/bin:{{ ansible_env.PATH }}"
       args:
@@ -100,10 +100,11 @@
            update=yes
 
     - name: Install OpenWind
-      shell: 'export PATH={{ conda_dir }}/bin:$PATH; {{ conda_dir }}/bin/python setup.py install'
+      shell: 'python setup.py install'
+      environment:
+        PATH: "{{ conda_dir }}/bin:{{ ansible_env.PATH }}"
       args:
         chdir: '{{ dev_sources_dir }}/openwind'
-      sudo: yes
 
     - name: Create data folder
       sudo: no
