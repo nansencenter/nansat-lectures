@@ -4,182 +4,82 @@
 # https://github.com/snowplow/ansible-playbooks (see python-data-science.yml)
 ---
 - hosts: all
+  remote_user: vagrant
+
   vars:
-    python_version: 2.7.10
-    python_version_major_minor: 2.7 # should be compatible with python_version listed above
     sources_dir: /usr/local/src
+    conda_dir: /home/vagrant/miniconda
     dev_sources_dir: /home/vagrant/python
-    geos_dir: /usr/local
-    initfiles:
-      - gunicorn
-
-    ipython_notebooks:
-      - profile:
-        port: 8888
-        user: vagrant
-        group: vagrant
-        sha1_password:
-        notebook_dir: /home/vagrant/python
-
-    proxy_env:
-      http_proxy: http://proxy.domain:8080
-      https_proxy: http://proxy.domain:8080
+    data_dir: /home/vagrant/data
 
   tasks:
     - name: Install required system packages.
       apt: pkg={{ item }} state=installed update-cache=yes
       sudo: yes
       with_items:
-        - build-essential
-        - unzip
         - git
-        - libsqlite3-dev
-        - sqlite3 # for the command line client
-        - libspatialite-dev
-        - spatialite-bin
+        - libx11-dev
         - g++
-        - libpng-dev
-        - libjpeg-dev
-        - libtiff5-dev
-        - libgeotiff-dev
-        - libnetcdf-dev
-        - libproj-dev
-        - libgeos-dev
-        - libxml2-dev
-        - libpq-dev
-        - python-dev
-        - python-setuptools
-        - python-numpy
-        - python-scipy
-        - pkg-config
-        - libfreetype6-dev
-        - gdal-bin
-        - python-gdal
-        - libgdal-dev
-        - gcc
-        - gfortran
-        - libpng3
-        - libpng12-0
-        - libpng12-dev
-        - libfreetype6
-        - libfreetype6-dev
-        - libblas-dev
-        - liblapack-dev
-        - liblapack3
-        - pandoc
-        - libxml2-dev
-        - libxslt1-dev
 
-    - name: Install required Python packages.
-      easy_install: name={{ item }}
+    - name: Download Miniconda
+      get_url:
+        url: ftp://ftp.nersc.no/pub/Anton/Miniconda-latest-Linux-x86_64.sh
+        #url: http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+        dest: '{{ sources_dir }}/miniconda.sh'
       sudo: yes
-      with_items:
-        - pip
-        - virtualenv
 
-    #- name: Ensure ansible-cache directory exists
-    #  shell: mkdir /var/local/ansible-cache creates=/var/local/ansible-cache
-    #  sudo: yes
-    #
-    ## Install Python
-    #- name: Download Python {{ python_version }}
-    #  get_url: dest=/var/local/ansible-cache url=https://www.python.org/ftp/python/{{ python_version }}/Python-{{ python_version }}.tar.xz
-    #  sudo: yes
-    #
-    #- name: Ensure Python {{ python_version }} is extracted
-    #  shell: chdir=/var/local/ansible-cache tar xJf ./Python-{{ python_version }}.tar.xz -C /opt creates=/opt/Python-{{ python_version }}
-    #  sudo: yes
-    #
-    #- name: Ensure Python {{ python_version }}is configured
-    #  shell: chdir=/opt/Python-{{ python_version }} ./configure --prefix=/opt/python{{ python_version }}
-    #
-    #- name: "Ensure Python {{ python_version }} make'd"
-    #  shell: chdir=/opt/Python-{{ python_version }} make
-    #
-    #- name: Ensure Python {{ python_version }} installed
-    #  shell: chdir=/opt/Python-{{ python_version }} make install  # Need to add a 'creates=' flag here
-    #  sudo: yes
-
-    # Setup a Python virtual environment to run the tracker
-    #- name: Setup an environment for data science
-    #  shell: /opt/python{{ python_version }}/bin/pyvenv-{{ python_version_major_minor }} python-data-science-environment chdir=/home/vagrant
-
-    - name: Install packages required for data science
-      pip: name={{ item }}
+    - name: Set Miniconda Owner
+      file: path={{ sources_dir }}/miniconda.sh owner=vagrant group=vagrant mode=755
       sudo: yes
-      with_items:
-        - ipython
-        - pillow
-        - netCDF
-        - scikit-learn
-        - pyzmq
-        - jinja2
-        - tornado
-        - ipdb
-        - nose
-        - coverage
-        - matplotlib
-        - Django
-        - django-forms-bootstrap
-        - django-leaflet
-        - pyzmq
-        - tornado
-        - jinja2
-        - pygments
-        - numpy
-        - matplotlib
-        - pandas
-        - lxml
-        - openpyxl
-        - xlrd
-        - twitter
-        - oauth2
-        - pypandoc
-        - scipy
-        - patsy
-        - statsmodels
-        - bokeh
-        - jupyter
 
-    # - name: Install the packages specified in requirements.txt in the Python 3.3 environment
-    #   pip: requirements=/vagrant/requirements.txt virtualenv=~/snowplow-python-3.3-tracker-environment
-
-    - name: Download basemap
-      sudo: yes
-      get_url: url=http://downloads.sourceforge.net/project/matplotlib/matplotlib-toolkits/basemap-1.0.7/basemap-1.0.7.tar.gz dest={{ sources_dir }}/basemap-1.0.7.tar.gz
-
-    - name: Create basemap directory
-      sudo: yes
-      file: path="{{ sources_dir }}/basemap" state=directory
-
-    - name: Extract basemap
-      sudo: yes
-      unarchive: copy=no src="{{ sources_dir }}/basemap-1.0.7.tar.gz" dest="{{ sources_dir }}/basemap/"
-
-    - name: Install geos
-      sudo: yes
-      shell: 'cd {{ sources_dir }}/basemap/basemap-1.0.7/geos-3.3.3 ; {{ item }}'
+    - name: Install Miniconda
+      shell: '{{ sources_dir }}/miniconda.sh -b -p {{ conda_dir }}'
       args:
-          # The 'creates' argument tells ansible that this file is created by
-          # the shell command. Then, if it exists, there is no need to run the
-          # command (not sure if this is the best file to check for though,
-          # since it is created by ./configure and not ldconfig)
-          # creates: "{{ sources_dir }}/basemap/basemap-1.0.7/geos-3.3.3/config.log"
-          creates: "{{ geos_dir }}/lib/libgeos-3.3.3.so"
-      with_items:
-          - ./configure --prefix={{ geos_dir }}
-          - make
-          - make install
-          - ldconfig
+        creates: '{{ conda_dir }}'
 
-    - name: Install basemap
-      sudo: yes
-      shell: 'cd {{ sources_dir }}/basemap/basemap-1.0.7/ ; {{ item }}'
+    - name: Add Miniconda PATH to .bashrc
+      lineinfile: dest=/home/vagrant/.bashrc line="export PATH={{ conda_dir }}/bin:$PATH"
+
+    - name: Update Miniconda
+      shell: 'export PATH={{ conda_dir }}/bin:$PATH; conda update -q --yes conda'
       args:
-        creates: /usr/local/lib/python2.7/dist-packages/basemap-1.0.7.egg-info
+        creates: '{{ conda_dir }}/conda-meta/history'
+
+    - name: Install scientific Python packages
+      shell: 'export PATH={{ conda_dir }}/bin:$PATH; conda install -q --yes {{ item }}'
       with_items:
-        - export GEOS_DIR={{ geos_dir }}
-        - python setup.py install
+        numpy
+        scipy
+        matplotlib
+        nose
+        pillow
+        ipython
+        ipython-notebook
+        postgresql
+        curl
+        pycurl
+        cython
+
+    - name: Install GDAL packages from OSGEO
+      shell: 'export PATH={{ conda_dir }}/bin:$PATH; conda install -q --yes -c osgeo {{ item }}'
+      with_items:
+        - gdal=1.11.2=np19py27_10
+        - proj4
+        - geos
+        - xerces-c
+        - libnetcdf=4.3.3.1=0
+        - hdf5=1.8.14=10
+
+    - name: Add GDAL_DATA to .bashrc
+      lineinfile: dest=/home/vagrant/.bashrc line="export GDAL_DATA={{ conda_dir }}/share/gdal"
+
+    - name: Install Basemap with PIP
+      shell: 'pip install basemap --allow-external basemap --allow-unverified basemap'
+      environment:
+        PATH: "{{ conda_dir }}/bin:{{ ansible_env.PATH }}"
+        GEOS_DIR: "{{ conda_dir }}"
+      args:
+        creates: '{{ conda_dir }}/lib/python2.7/site-packages/basemap-1.0.7.dist-info'
 
     - name: Update/checkout Nansat
       git: repo=https://github.com/nansencenter/nansat
@@ -188,17 +88,38 @@
            update=yes
 
     - name: Install Nansat
-      sudo: yes
-      shell: 'cd {{ dev_sources_dir }}/nansat ; {{ item }}'
-      with_items:
-          - python setup.py install
+      shell: 'python setup.py install'
+      environment:
+        PATH: "{{ conda_dir }}/bin:{{ ansible_env.PATH }}"
+      args:
+        chdir: '{{ dev_sources_dir }}/nansat'
+
+    - name: Update/checkout OpenWind
+      git: repo=https://github.com/nansencenter/openwind
+           dest="{{ dev_sources_dir }}/openwind"
+           version=develop
+           update=yes
+
+    - name: Install OpenWind
+      shell: 'python setup.py install'
+      environment:
+        PATH: "{{ conda_dir }}/bin:{{ ansible_env.PATH }}"
+      args:
+        chdir: '{{ dev_sources_dir }}/openwind'
+
+    - name: Create data folder
+      file: path="{{ data_dir }}" state=directory
+
+    - name: Download Sentinel-1 sample acquisition
+      get_url:
+        url: ftp://ftp.nersc.no/pub/python_test_data/sentinel1a/S1A_IW_GRDH_1SDV_20141003T053708_20141003T053737_002661_002F66_A2F4.zip
+        dest: "{{ data_dir }}"
 
     - name: Add Ipython Notebook to crontab
-      sudo: yes
-      cron: name="Ipython Notebook" special_time=reboot job="/usr/local/bin/ipython notebook --ip=0.0.0.0 --no-browser --notebook-dir=/home/vagrant/notebooks"
+      cron: name="Ipython Notebook" special_time=reboot job="{{ conda_dir }}/bin/ipython notebook --ip=0.0.0.0 --no-browser --notebook-dir=/home/vagrant/notebooks"
 
-    - name: Launch Ipython Notebook
-      sudo: yes
-      command: /usr/local/bin/ipython notebook --ip=0.0.0.0 --no-browser --notebook-dir=/home/vagrant/notebooks
-      async: 15
-      poll: 0
+    #- name: Launch Ipython Notebook
+    #  command: "{{ conda_dir }}/bin/ipython notebook --ip=0.0.0.0 --no-browser --notebook-dir=/home/vagrant/notebooks"
+    #  sudo: yes
+    #  async: 15
+    #  poll: 0
