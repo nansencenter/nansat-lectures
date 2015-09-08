@@ -10,7 +10,7 @@
     sources_dir: /usr/local/src
     dev_sources_dir: /home/vagrant/python
     data_dir: /home/vagrant/data
-    sentinel_file: S1A_IW_GRDH_1SDV_20141003T053708_20141003T053737_002661_002F66_A2F4.zip
+    sentinel_file: S1A_EW_GRDM_1SDH_20150702T172954_20150702T173054_006635_008DA5_55D1.zip
 
   tasks:
     - name: Install required system packages.
