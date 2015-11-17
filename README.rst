@@ -28,6 +28,10 @@ Start virtual machine and install everything::
 
 Wait c.a. 10 minutes untill all Nansat dependencies are installed.
 
-Now open <http://192.168.33.11:8888> with your favorite browser. Jupyter Notebook manager should appear where you will find available notebooks. To start with, open the 'hello-world' notebook, click in the cell right after the 'print "Hello, World!"' statement and press Shift-Enter.
+Now restart virtual machine and wait 1-2 minutes until ipython notebooks are available:
+    vagrant halt course
+    vagrant up course
+
+Open <http://192.168.33.11:8888> with your favorite browser. Jupyter Notebook manager should appear where you will find available notebooks. To start with, open the 'hello-world' notebook, click in the cell right after the 'print "Hello, World!"' statement and press Shift-Enter.
 
 Enjoy the course!
