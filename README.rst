@@ -29,6 +29,7 @@ Start virtual machine and install everything::
 Wait c.a. 10 minutes untill all Nansat dependencies are installed.
 
 Now restart virtual machine and wait 1-2 minutes until ipython notebooks are available:
+
     vagrant halt course
     vagrant up course
 
