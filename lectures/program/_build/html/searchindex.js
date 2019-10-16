@@ -1,1 +1,0 @@
-Search.setIndex({envversion:42,terms:{softwar:0,cours:0,practic:0,python:0,lectur:0,lunch:0,basic:0,instal:0,introduct:0},objtypes:{},objnames:{},filenames:["index"],titles:["Program"],objects:{},titleterms:{program:0,mondai:0}})
