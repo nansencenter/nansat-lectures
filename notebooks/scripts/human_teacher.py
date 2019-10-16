@@ -26,4 +26,4 @@ class Teacher(Human):
         ''' Print lecture on the screen '''
 
         lecture = 'bla bla bla'
-        print lecture
+        print (lecture)
