@@ -6,7 +6,7 @@ Materials for the course on scientific programming with Python
 
 Installation
 ------------
-For simple installation the Nansat Lectures can be provided in a container:
+For simple installation the Nansat Lectures can be provided in a container::
 
     # 1. Install Docker <https://www.docker.com> on your platform. 
 
