@@ -6,7 +6,24 @@ Materials for the course on scientific programming with Python
 
 Installation
 ------------
-For simple installation the Nansat Lectures can be provided on a virtual machine. In order to configure and start the virtual machine you will first need to install:
+For simple installation the Nansat Lectures can be provided in a container::
+
+    # 1. Install Docker <https://www.docker.com> on your platform. 
+
+    # 2. Clone Nansat Lectures repository to your computer
+    git clone https://github.com/nansencenter/nansat-lectures.git
+
+    # 3. Build a Docker image with Jupyter Notebook and Nansat installed
+    cd nansat-lectures
+    docker build . -t nansat-lectures
+
+    # 4. Start Jupyter Notebook in a Docker container
+    docker run --rm -it -v `pwd`:/src -p 8888:8888 nansat-lectures jupyter notebook --allow-root --no-browser --ip=0.0.0.0
+ 
+    # 5. Open the link shown by the Jupyter in your browser
+
+
+Alternatively, Nansat-lectures can also be run on a virtual machine. In order to configure and start the virtual machine you will first need to install:
 
  * GIT <https://git-scm.com/>
  * Vagrant <https://www.vagrantup.com/>
