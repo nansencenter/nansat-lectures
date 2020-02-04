@@ -6,7 +6,7 @@ Materials for the course on scientific programming with Python
 
 Installation
 ------------
-For simple installation the Nansat Lectures can be run in a container::
+For simple installation the Nansat Lectures can be run in a Docker container::
 
     # 1. Install Docker <https://www.docker.com> on your platform.
 
@@ -15,7 +15,7 @@ For simple installation the Nansat Lectures can be run in a container::
     cd nansat-lectures
 
     # 3. Start Jupyter Notebook in a Docker container
-    docker run --rm -v `pwd`:/src -p 8888:8888 akorosov/nansat-lectures
+    docker run --rm -v `pwd`:/src -p 8888:8888 nansencenter/nansat-lectures
 
     # 4. Open the link given by the Jupyter Notebook in your browser
 
