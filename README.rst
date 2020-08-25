@@ -16,7 +16,9 @@ For simple installation the Nansat Lectures can be run in a Docker container::
 
     # 3. Start Jupyter Notebook in a Docker container
     docker run --rm -v `pwd`:/src -p 8888:8888 nansencenter/nansat-lectures
-
+    (for windows users)
+    docker run --rm -v %cd%:/src -p 8888:8888 nansencenter/nansat-lectures
+    
     # 4. Open the link given by the Jupyter Notebook in your browser
 
 
